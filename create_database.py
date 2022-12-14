@@ -1,3 +1,4 @@
+import random
 from datetime import date, datetime, timedelta
 from random import randint
 import sqlite3
@@ -42,6 +43,8 @@ def fill_data(db_name: Path):
                       'Дискретная математика']
     number_students = 30
     number_teachers = 3
+    number_grades_of_student = 20
+
     fake_ = faker.Faker('ru-RU')
 
     conn = sqlite3.connect(db_name)
@@ -71,22 +74,30 @@ def fill_data(db_name: Path):
             cur.execute(sql_disciplines, (discipline, randint(1, number_teachers)))
 
     def fill_grades_table():
+        fake_grades = []
         start_date = datetime.strptime('01.09.2021', '%d.%m.%Y')
         end_date = datetime.strptime('25.05.2022', '%d.%m.%Y')
         fake_date = data_range(start=start_date, end=end_date)
 
-        sql_disciplines = 'INSERT INTO grades(name, teacher_id) VALUES (?, ?)'
-        for discipline in fake_disciplines:
-            cur.execute(sql_disciplines, (discipline, randint(1, number_teachers)))
+        sql_disciplines = 'INSERT INTO grades(grade, student_id, discipline_id, date_of) VALUES (?, ?, ?, ?)'
+
+        for student_id in range(1, number_students+1):
+            for _ in range(number_grades_of_student):
+                grade = randint(1, 12)
+                discipline_id = randint(1, len(fake_disciplines))
+                date_of = random.choice(fake_date)
+                fake_grades.append((grade, student_id, discipline_id, date_of))
+        cur.executemany(sql_disciplines, fake_grades)
 
     # for _ in range(number_teachers):
     #     fake_teachers.append(fake_.name())
     #
 
-    # fill_group_table()
-    # fill_students_table()
-    # fill_teachers_table()
-    # fill_disciplines_table()
+    fill_group_table()
+    fill_students_table()
+    fill_teachers_table()
+    fill_disciplines_table()
+    fill_grades_table()
 
     conn.commit()
 

@@ -1,8 +1,7 @@
-import random
 from datetime import date, datetime, timedelta
+import random
 from random import randint
 import sqlite3
-from sqlite3 import Error
 from pathlib import Path
 import faker
 
@@ -86,7 +85,7 @@ def fill_data(db_name: Path):
                 grade = randint(1, 12)
                 discipline_id = randint(1, len(fake_disciplines))
                 date_of = random.choice(fake_date)
-                fake_grades.append((grade, student_id, discipline_id, date_of))
+                fake_grades.append((grade, student_id, discipline_id, date_of.date()))
         cur.executemany(sql_disciplines, fake_grades)
 
     # for _ in range(number_teachers):
